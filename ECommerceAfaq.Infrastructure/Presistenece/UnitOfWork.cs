@@ -3,6 +3,7 @@ using ECommerceAfaq.Domain.Entities;
 using ECommerceAfaq.Infrastructure.Repositories;
 using ECommerceAfaq.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace ECommerceAfaq.Infrastructure.Presistenece
     {
         private readonly AppDbContext _dbContext;
 
+        private IDbContextTransaction? _currentTransaction;
         private IGenericRpository<Category>? _categories;
 
         private readonly ConcurrentDictionary<Type, object> _repositories = new();
@@ -59,6 +61,40 @@ namespace ECommerceAfaq.Infrastructure.Presistenece
         public async Task<int> SaveChangesAsync()
         {
             return await _dbContext.SaveChangesAsync();
+        }
+
+
+
+
+        public async Task BeginTransactionAsync()
+        {
+            _currentTransaction = await _dbContext.Database.BeginTransactionAsync();
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            try
+            {
+                await _currentTransaction!.CommitAsync();
+            }
+            finally
+            {
+                await _currentTransaction!.DisposeAsync();
+                _currentTransaction = null;
+            }
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            try
+            {
+                await _currentTransaction!.RollbackAsync();
+            }
+            finally
+            {
+                await _currentTransaction!.DisposeAsync();
+                _currentTransaction = null;
+            }
         }
     }
 }

@@ -11,7 +11,9 @@ namespace ECommerceAfaq.Application.Interfaces
         IProductRepository Products { get; }
         ICartRepository Carts { get; }
 
-
+        Task BeginTransactionAsync(); 
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
         IGenericRpository<T> Repository<T>() where T : class;
         Task<int> SaveChangesAsync();
 

@@ -19,8 +19,14 @@ namespace ECommerceAfaq.Infrastructure.Presistenece
 
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-
         public DbSet<Address> Addresses { get; set; }
+
+        public DbSet<WishListItem> WishListItems { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
