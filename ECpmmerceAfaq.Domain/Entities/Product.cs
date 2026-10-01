@@ -18,6 +18,8 @@ namespace ECommerceAfaq.Domain.Entities
         //  Navigation  Property
         public Category Category { get; set; } = null!;
 
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
 
     }
 }

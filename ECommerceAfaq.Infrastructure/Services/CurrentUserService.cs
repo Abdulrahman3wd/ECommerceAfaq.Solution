@@ -26,6 +26,7 @@ namespace ECommerceAfaq.Infrastructure.Services
             .Identity?
             .IsAuthenticated ?? false;
 
-
+        public string? FullName => 
+            _httpContextAccessor.HttpContext?.User?.FindFirst("fullName")?.Value; // user full name
     }
 }

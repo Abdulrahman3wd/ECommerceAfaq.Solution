@@ -124,6 +124,14 @@ namespace ECommerceAfaq.Infrastructure.Services
         public async Task<List<OrderResponseDto>> GetUserOrdersAsync(string userId)
         {
             var orders = await _unitOfWork.Repository<Order>().FindAsync(o => o.UserId == userId); 
+
+            // Load related OrderItems for each order since repository queries use AsNoTracking and do not include navigation properties
+            foreach (var order in orders)
+            {
+                var items = await _unitOfWork.Repository<OrderItem>().FindAsync(oi => oi.OrderId == order.Id);
+                order.OrderItems = items;
+            }
+
             return orders.OrderByDescending(o => o.CreatedAt).Select(MapToResponseDto).ToList();
         }
 
@@ -137,6 +145,10 @@ namespace ECommerceAfaq.Infrastructure.Services
 
             if (!isAdmin && order.UserId != userId)
                 return null;
+
+            // ensure order items are loaded
+            var items = await _unitOfWork.Repository<OrderItem>().FindAsync(oi => oi.OrderId == order.Id);
+            order.OrderItems = items;
 
             return MapToResponseDto(order);
         }
@@ -187,9 +199,16 @@ namespace ECommerceAfaq.Infrastructure.Services
         public async Task<List<OrderResponseDto>> GetAllOrdersAsync()
         {
             var orders = await _unitOfWork.Repository<Order>().GetAllAsync();
+
+            // load items for each order
+            foreach (var order in orders)
+            {
+                var items = await _unitOfWork.Repository<OrderItem>().FindAsync(oi => oi.OrderId == order.Id);
+                order.OrderItems = items;
+            }
+
             return orders.OrderByDescending(o=>o.CreatedAt).Select(MapToResponseDto).ToList();
         }
-
 
 
 
